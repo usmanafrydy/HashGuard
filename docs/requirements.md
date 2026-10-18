@@ -56,16 +56,28 @@ want to check important files on their computers for unexpected changes.
 - **FR-03 — Calculate Hashes:** The application shall calculate a
   SHA-256 hash for each readable file included in the scan.
 
-- **FR-04 — Create a Baseline:** The application shall allow the user
-  to save an initial reference containing file paths and hashes.
-  It shall report any files that could not be included.
+- **FR-04 — Create a Baseline:** The application shall allow the
+  user to save a reference containing the selected folder's
+  absolute path, baseline creation time, hash algorithm, and
+  exclusion settings. For each successfully checked file, it
+  shall store the path relative to the selected folder and its
+  SHA-256 hash. Files that could not be included shall be
+  recorded, and the baseline shall be marked as incomplete.
 
-- **FR-05 — Load a Baseline:** The application shall allow the user
-  to load a saved baseline for comparison with a later scan.
+- **FR-05 — Load and Validate a Baseline:** The application shall
+  allow the user to load a saved baseline for comparison with a
+  later scan. It shall check that the baseline contains the
+  required information and matches the selected folder. If the
+  baseline is invalid or belongs to a different folder, the
+  application shall explain the problem and stop the comparison.
 
-- **FR-06 — Detect Changes:** The application shall compare the current
-  scan with the baseline and identify added, modified, deleted,
-  and unchanged files.
+- **FR-06 — Detect Changes:** The application shall compare the
+  current scan with the baseline and identify added, modified,
+  deleted, and unchanged files where sufficient information is
+  available. If a file or location was not successfully checked
+  during baseline creation or the current scan, the application
+  shall report the affected comparison as unverified rather
+  than assign an unsupported change status.
 
 - **FR-07 — Report Verification Errors:** The application shall report
   files or folders that could not be checked. Files in inaccessible
