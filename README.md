@@ -126,8 +126,41 @@ Requirements and backlog items will be updated as the project evolves.
 
 ## Repository Conventions
 
-- Python files and folders will use lowercase names with underscores.
-- Commits will use descriptive messages explaining the changes.
-- Git history and tags will track project versions.
-- Private files, credentials, and personal scan results will not be
-  committed to the public repository.
+### Files and Folders
+
+- Use lowercase names for files and folders.
+- Use underscores to separate words in Python filenames,
+  such as file_scanner.py.
+- Keep project documentation in docs, application code in src,
+  and automated tests in tests as development progresses.
+- Keep README.md uppercase to follow the repository's existing convention.
+
+### Requirement and Task Identifiers
+
+- Functional requirements use FR-01, FR-02, and so on.
+- Non-functional requirements use NFR-01, NFR-02, and so on.
+- Backlog tasks use HG-01, HG-02, and so on.
+- Split tasks may use suffixes, such as HG-03A and HG-03B.
+- Keep identifiers stable so commits and tests can refer to them.
+
+### Commits
+
+- Write meaningful messages describing the changes.
+- Use docs: for documentation, feat: for new functionality,
+  fix: for corrections, and test: for automated tests.
+- Each member commits their own contributions using their own account.
+
+### Project Versions
+
+- Use Git history to track changes and tags to identify milestones.
+- Use v0.1.0 for the initial project setup and requirements milestone.
+- Use later v0.x.0 tags for development milestones.
+- Use v1.0.0 for the first complete release.
+- Do not create duplicate files with names such as final_v2
+  to represent different versions.
+
+### Repository Privacy
+
+- Do not commit passwords, credentials, private files,
+  or personal scan results.
+- Use synthetic files and data for demonstrations and tests.
