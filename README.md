@@ -1,4 +1,5 @@
 # HashGuard
+
 HashGuard is a Python-based file integrity monitoring system developed for our Software Construction and Development Course semester project.
 
 The application will calculate SHA-256 hashes for files in a selected
@@ -10,11 +11,12 @@ unverified.
 HashGuard aims to help users identify unexpected file changes and
 review the results through a desktop interface and exported reports.
 
-
 ## Course
+
 Software Construction and Development.
 
-##Instructor
+## Instructor
+
 Sir Umer Haroon
 
 ## Group Members
@@ -26,6 +28,7 @@ Sir Umer Haroon
 | Mushaf Mashood      |      39     |
 
 ## Problem Statement
+
 Manually checking a collection of files for changes is time-consuming
 and becomes difficult as the number of files increases. File names,
 sizes, and modification dates alone do not reliably establish whether
@@ -68,7 +71,7 @@ functionalities are complete.
 ## Planned Technologies
 
 | Technology | Purpose |
-|---|---|
+| --- | --- |  
 | Python | Application development |
 | hashlib | SHA-256 file hashing |
 | pathlib and os | File paths and directory traversal |
