@@ -18,7 +18,8 @@ Priorities, responsibilities, and statuses will be updated as development progre
 | HG-03A | Review functional requirements and add acceptance conditions for baseline creation and change detection | Must | Siaf | To do |
 | HG-03B | Review error handling and limitations and document related test scenarios | Must | Mushaf | To do |
 | HG-04 | Review backlog priorities and agree on responsibilities | Must | All members | Done |
-| HG-05 | Export the reviewed requirements to PDF and add it to the repository | Must | Usman | To do |
+| HG-05A | Export the draft requirements to PDF and add it to the repository | Must | Usman | Done |
+| HG-05B | Finalize requirements after group review and update the Markdown and PDF copies | Must | Usman | To do |
 | HG-06 | Calculate the SHA-256 hash of a file | Must | To be agreed | To do |
 | HG-07 | Scan a folder and its subfolders with exclusion rules | Must | To be agreed | To do |
 | HG-08 | Save and load a baseline without overwriting it during comparison | Must | To be agreed | To do |
