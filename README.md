@@ -105,13 +105,14 @@ The current milestone is to establish the shared repository,
 document the initial requirements, assign responsibilities, and
 prepare a prioritized product backlog.
 
-## Documentation Plan
+## Project Documentation
 
-The following documents will be added during the initial milestone:
+- [Requirements document](docs/requirements.md)
+- [Requirements PDF](docs/requirements.pdf)
+- [Product backlog](docs/backlog.md)
 
-- docs/requirements.md — editable project requirements.
-- docs/backlog.md — prioritized tasks, responsibilities, and progress.
-- docs/requirements.pdf — the reviewed requirements document for submission.
+The requirements and PDF are currently drafts.
+Group reviews are pending.
 
 ## Development Approach
 
