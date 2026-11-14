@@ -11,6 +11,13 @@ unverified.
 HashGuard aims to help users identify unexpected file changes and
 review the results through a desktop interface and exported reports.
 
+HashGuard will also include a Security Advisories section that uses
+web scraping to retrieve cybersecurity alerts from one configured
+public website. Users will be able to refresh the advisories and
+view their titles, available publication dates, and source links.
+Internet access will be needed to retrieve new advisories, while
+local file scanning and baseline comparison will work offline.
+
 ## Course
 
 Software Construction and Development.
@@ -64,6 +71,13 @@ have changed since a trusted baseline was created.
 - Display and filter scan results.
 - Export scan reports in CSV format.
 - Provide a desktop interface.
+- Retrieve up to 10 recent security advisories using HTML web scraping.
+- Display advisory titles, available publication dates, source links,
+  and the last successful retrieval time.
+- Handle failed advisory refreshes without interrupting local
+  file scanning or baseline comparison.
+- Keep the desktop interface responsive during scanning and
+  advisory retrieval.
 
 Scan history and periodic scanning may be added after the core
 functionalities are complete.
@@ -80,6 +94,9 @@ functionalities are complete.
 | csv | Report export |
 | unittest | Automated testing |
 | Git and GitHub | Version control and collaboration |
+| requests | Download security advisory webpages |
+| BeautifulSoup (beautifulsoup4) | Extract advisory information from HTML |
+| threading and queue | Run background tasks and pass results to the interface |
 
 SQLite may be introduced if persistent scan history is implemented.
 
@@ -98,20 +115,23 @@ SQLite may be introduced if persistent scan history is implemented.
 
 ## Current Project Status
 
-Project initiation and requirements documentation are in progress.
-Application implementation has not started.
+The initial repository setup and first assignment submission are
+complete. Requirements and backlog updates are being reviewed to
+include mandatory web scraping and alignment with the course outline.
 
-The current milestone is to establish the shared repository,
-document the initial requirements, assign responsibilities, and
-prepare a prioritized product backlog.
+Application implementation has not started. The next development
+milestone is to implement and test SHA-256 hashing for a single file.
 
 ## Project Documentation
 
 - [Requirements document](docs/requirements.md)
 - [Requirements PDF](docs/requirements.pdf)
 - [Product backlog](docs/backlog.md)
+- [Course alignment checklist](docs/course-alignment.md)
 
-The requirements and PDF are currently drafts.
+The Markdown requirements include recent updates for web scraping
+and course alignment. The requirements PDF represents the earlier
+draft and has not yet been updated to match these changes.
 Group reviews are pending.
 
 ## Development Approach

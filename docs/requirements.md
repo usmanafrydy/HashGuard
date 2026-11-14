@@ -32,6 +32,8 @@ Files can be changed or deleted without the user noticing. Checking every file m
 - Clearly report files that could not be checked.
 - Present scan results in a way that is easy to understand.
 - Allow users to export scan results for later review.
+- Help users stay informed about cybersecurity threats by retrieving
+  and displaying security advisories through web scraping.
 
 ## Intended Users
 
@@ -98,6 +100,24 @@ want to check important files on their computers for unexpected changes.
   not automatically overwrite the saved baseline. Creating a new
   baseline shall require an explicit user action.
 
+- **FR-12 — Retrieve Security Advisories:** The application shall
+  allow the user to manually retrieve security advisories from one
+  configured public cybersecurity website. It shall download the
+  webpage and extract advisory information from its HTML using
+  web scraping. The application shall display up to 10 recent
+  advisories, including their titles, publication dates when
+  available, and links to the original articles. It shall show
+  when the information was last successfully retrieved.
+
+- **FR-13 — Handle Advisory Retrieval Errors:** If the advisory
+  website cannot be reached or the expected information cannot
+  be extracted, the application shall display a clear error
+  message. A failed refresh shall preserve any previously
+  retrieved advisories and their last successful retrieval time.
+  The application shall indicate that the refresh failed.
+  Local file scanning and baseline comparison shall remain
+  available when advisory retrieval fails.
+
 ## Non-Functional Requirements
 
 - **NFR-01 — Usability:** The interface shall use clear labels and
@@ -118,14 +138,23 @@ want to check important files on their computers for unexpected changes.
 
 - **NFR-05 — Maintainability:** The code shall be organized into
   separate modules for scanning, hashing, comparison, storage,
-  reporting, and the interface.
+  reporting, security advisory retrieval, and the interface.
+  Each module shall have a clear responsibility.
 
-- **NFR-06 — Testability:** The core hashing and comparison functions
-  shall be testable without opening the desktop interface.
+- **NFR-06 — Testability:** The core hashing, comparison, and
+  advisory HTML parsing functions shall be testable without
+  opening the desktop interface or making live internet requests.
+  Advisory parsing tests shall use saved sample HTML with known
+  expected results.
 
 - **NFR-07 — Compatibility:** The initial application shall be
   developed and tested on Windows using Python 3. The tested
   Python version shall be recorded in the project documentation.
+
+- **NFR-08 — Responsiveness:** The desktop interface shall remain
+  responsive while file scanning or security advisory retrieval
+  is running. It shall display progress information when available,
+  or a busy indicator when progress cannot be measured.
 
 ## Prioritized Features
 
@@ -139,6 +168,9 @@ want to check important files on their computers for unexpected changes.
 - Apply exclusion rules consistently.
 - Preserve the baseline unless the user explicitly creates a new one.
 - Display understandable scan results.
+- Retrieve and display security advisories through HTML web scraping.
+- Handle advisory retrieval failures without interrupting local
+  file scanning or baseline comparison.
 
 ### Should Have
 
@@ -175,6 +207,11 @@ time available.
 - The application will run locally on the user's computer.
   An internet connection will not be required for its core scanning
   and comparison features.
+
+- Retrieving new security advisories will require an internet
+  connection and access to the configured cybersecurity website.
+  Previously retrieved advisories may become outdated, so their
+  last successful retrieval time will remain visible.
 
 ## Project Constraints
 
@@ -226,3 +263,11 @@ time available.
 - The initial version will check file contents. Changes only to
   file permissions or other metadata will not be treated as
   content modifications.
+
+- Changes to the source website's HTML structure may prevent
+  advisory retrieval until the scraping code is updated.
+  Website downtime or connection problems may also prevent updates.
+
+- Security advisories provide general cybersecurity information.
+  They do not establish whether a monitored file is malicious
+  or whether a particular file change is related to an advisory.
