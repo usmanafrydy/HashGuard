@@ -20,13 +20,13 @@ Priorities, responsibilities, and statuses will be updated as development progre
 | HG-04 | Review backlog priorities and agree on responsibilities | Must | All members | Done |
 | HG-05A | Export the draft requirements to PDF and add it to the repository | Must | Usman | Done |
 | HG-05B | Finalize requirements after group review and update the Markdown and PDF copies | Must | Usman | To do |
-| HG-06 | Calculate the SHA-256 hash of a file | Must | To be agreed | To do |
-| HG-07 | Scan a folder and its subfolders with exclusion rules | Must | To be agreed | To do |
+| HG-06 | Calculate the SHA-256 hash of a file | Must | Mushaf | Done |
+| HG-07 | Scan a folder and its subfolders with exclusion rules | Must | Usman | In progress |
 | HG-08 | Save and load a baseline without overwriting it during comparison | Must | To be agreed | To do |
 | HG-09 | Detect added, modified, deleted, and unchanged files | Must | To be agreed | To do |
 | HG-10 | Report unreadable files and incomplete scans | Must | To be agreed | To do |
 | HG-11 | Display file statuses and a scan summary | Must | To be agreed | To do |
-| HG-12 | Write automated tests for hashing, comparison, and error handling | Must | To be agreed | To do |
+| HG-12 | Write automated tests for hashing, comparison, and error handling | Must | To be agreed | In progress |
 | HG-13 | Build the desktop interface | Should | To be agreed | To do |
 | HG-14 | Export scan results as CSV | Should | To be agreed | To do |
 | HG-15 | Filter results by file status | Should | To be agreed | To do |

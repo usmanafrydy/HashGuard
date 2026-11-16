@@ -115,12 +115,14 @@ SQLite may be introduced if persistent scan history is implemented.
 
 ## Current Project Status
 
-The initial repository setup and first assignment submission are
-complete. Requirements and backlog updates are being reviewed to
-include mandatory web scraping and alignment with the course outline.
+The initial repository setup and first assignment submission are complete.
 
-Application implementation has not started. The next development
-milestone is to implement and test SHA-256 hashing for a single file.
+Core development is in progress. File hashing, folder validation,
+and immediate and recursive file discovery are implemented with
+automated tests.
+
+The next milestone is to add exclusion rules and collect scan errors
+while continuing through accessible files.
 
 ## Project Documentation
 
