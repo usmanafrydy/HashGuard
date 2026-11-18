@@ -22,7 +22,7 @@ Priorities, responsibilities, and statuses will be updated as development progre
 | HG-05B | Finalize requirements after group review and update the Markdown and PDF copies | Must | Usman | To do |
 | HG-06 | Calculate the SHA-256 hash of a file | Must | Mushaf | Done |
 | HG-07 | Scan a folder and its subfolders with exclusion rules | Must | Usman | In progress |
-| HG-08 | Save and load a baseline without overwriting it during comparison | Must | To be agreed | To do |
+| HG-08 | Save and load a baseline without overwriting it during comparison | Must | Siaf Akbar | In progress |
 | HG-09 | Detect added, modified, deleted, and unchanged files | Must | To be agreed | To do |
 | HG-10 | Report unreadable files and incomplete scans | Must | To be agreed | To do |
 | HG-11 | Display file statuses and a scan summary | Must | To be agreed | To do |
