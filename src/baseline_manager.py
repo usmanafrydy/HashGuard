@@ -15,7 +15,14 @@ BASELINE_VERSION = 1
 
 def create_baseline(folder_path, exclusions=None):
     """Create baseline data for successfully verified files."""
-    root = Path(folder_path).resolve()
+    selected_folder = Path(folder_path)
+
+    if selected_folder.is_symlink() or selected_folder.is_junction():
+        raise ValueError(
+            "Select a folder that is not a symbolic link or junction."
+        )
+
+    root = selected_folder.resolve()
 
     if not root.is_dir():
         raise NotADirectoryError(f"Expected an existing folder: {root}")
@@ -81,6 +88,18 @@ def save_baseline(baseline, destination):
         )
 
     validate_baseline(baseline)
+
+    monitored_folder = Path(baseline["root_path"]).resolve()
+    resolved_destination = destination.resolve()
+
+    try:
+        resolved_destination.relative_to(monitored_folder)
+    except ValueError:
+        pass
+    else:
+        raise ValueError(
+            "Baseline must be saved outside the monitored folder."
+        )
 
     destination.parent.mkdir(parents=True, exist_ok=True)
 
@@ -181,6 +200,7 @@ def validate_baseline(baseline, selected_folder=None):
         ):
             raise ValueError(f"Unsafe relative file path: {relative_path}")
 
+        # Correct SHA-256 validation: exactly 64 hexadecimal characters.
         if not isinstance(file_hash, str) or not re.fullmatch(
             r"[0-9a-f]{64}", file_hash
         ):
