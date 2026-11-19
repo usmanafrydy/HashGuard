@@ -118,6 +118,41 @@ want to check important files on their computers for unexpected changes.
   Local file scanning and baseline comparison shall remain
   available when advisory retrieval fails.
 
+## Acceptance Conditions
+
+### Baseline Creation (FR-04)
+
+- A baseline shall be created successfully when the selected folder has been scanned and the required baseline information has been saved.
+- The baseline shall contain the selected folder's absolute path, creation time, hash algorithm, exclusion settings, and file records.
+- Each successfully checked file shall have a relative path and SHA-256 hash stored in the baseline.
+- Files that cannot be checked shall be recorded as errors.
+- If files cannot be checked, the baseline shall be marked as incomplete.
+- The application shall not silently treat an incomplete baseline as fully verified.
+
+### Baseline Loading and Validation (FR-05)
+
+- A valid baseline shall load successfully when it contains all required information and belongs to the selected folder.
+- A baseline with missing, invalid, or corrupted required information shall be rejected.
+- A baseline belonging to a different folder shall not be used for comparison.
+- When baseline validation fails, the application shall display an understandable error message.
+- The comparison shall not proceed using an invalid baseline.
+
+### Change Detection (FR-06)
+
+- A file present in the current scan but absent from the baseline shall be classified as Added.
+- A file present in both scans with different SHA-256 hashes shall be classified as Modified.
+- A file present in the baseline but absent from a successfully completed current scan shall be classified as Deleted.
+- A file present in both scans with matching SHA-256 hashes shall be classified as Unchanged.
+- Files affected by incomplete scans or verification errors shall be classified as Unverified when their status cannot be reliably determined.
+- The comparison shall not classify inaccessible files or folders as Deleted without sufficient verification.
+- The comparison summary shall accurately reflect the number of files in each status.
+
+### Baseline Preservation (FR-11)
+
+- Performing a comparison shall not modify the existing baseline.
+- A new baseline shall only be created following an explicit user action.
+- The existing baseline shall remain available after a comparison is completed.
+
 ## Non-Functional Requirements
 
 - **NFR-01 — Usability:** The interface shall use clear labels and
