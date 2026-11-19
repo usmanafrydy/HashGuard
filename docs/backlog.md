@@ -12,7 +12,7 @@ Priorities, responsibilities, and statuses will be updated as development progre
 ## Tasks
 
 | ID | Task | Priority | Owner | Status |
-| --- | --- | --- | --- | --- |  
+| --- | --- | --- | --- | --- |
 | HG-01 | Create the public repository and initial README | Must | Usman | Done |
 | HG-02 | Draft the initial requirements document | Must | Usman | Done |
 | HG-03A | Review functional requirements and add acceptance conditions for baseline creation and change detection | Must | Siaf | To do |
@@ -22,8 +22,8 @@ Priorities, responsibilities, and statuses will be updated as development progre
 | HG-05B | Finalize requirements after group review and update the Markdown and PDF copies | Must | Usman | To do |
 | HG-06 | Calculate the SHA-256 hash of a file | Must | Mushaf | Done |
 | HG-07 | Scan a folder and its subfolders with exclusion rules | Must | Usman | In progress |
-| HG-08 | Save and load a baseline without overwriting it during comparison | Must | Siaf Akbar | In progress |
-| HG-09 | Detect added, modified, deleted, and unchanged files | Must | To be agreed | To do |
+| HG-08 | Save and load a baseline without overwriting it during comparison | Must | Siaf Akbar | Done |
+| HG-09 | Detect added, modified, deleted, and unchanged files | Must | Siaf Akbar | Done |
 | HG-10 | Report unreadable files and incomplete scans | Must | To be agreed | To do |
 | HG-11 | Display file statuses and a scan summary | Must | To be agreed | To do |
 | HG-12 | Write automated tests for hashing, comparison, and error handling | Must | To be agreed | In progress |
