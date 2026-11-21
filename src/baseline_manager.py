@@ -13,8 +13,10 @@ HASH_ALGORITHM = "SHA-256"
 BASELINE_VERSION = 1
 
 
+
 def create_baseline(folder_path, exclusions=None):
     """Create baseline data for successfully verified files."""
+
     selected_folder = Path(folder_path)
 
     if selected_folder.is_symlink() or selected_folder.is_junction():
@@ -25,26 +27,33 @@ def create_baseline(folder_path, exclusions=None):
     root = selected_folder.resolve()
 
     if not root.is_dir():
-        raise NotADirectoryError(f"Expected an existing folder: {root}")
+        raise NotADirectoryError(
+            f"Expected an existing folder: {root}"
+        )
 
     exclusions = list(exclusions or [])
+
     files = {}
     failed_files = []
 
     try:
-        scanned_files = scan_folder(root)
+        scanned_files = scan_folder(
+            root,
+            exclusions=exclusions,
+            errors=failed_files,
+        )
+
     except OSError as error:
         failed_files.append({
             "path": ".",
             "error": f"Folder scanning failed: {error}",
+            "kind": "folder",
         })
+
         scanned_files = []
 
     for file_path in scanned_files:
         relative_path = file_path.relative_to(root).as_posix()
-
-        if relative_path in exclusions:
-            continue
 
         try:
             before = file_path.stat()
@@ -55,7 +64,9 @@ def create_baseline(folder_path, exclusions=None):
                 before.st_size != after.st_size
                 or before.st_mtime_ns != after.st_mtime_ns
             ):
-                raise OSError("File changed while being hashed.")
+                raise OSError(
+                    "File changed while being hashed."
+                )
 
             files[relative_path] = file_hash
 
@@ -63,6 +74,7 @@ def create_baseline(folder_path, exclusions=None):
             failed_files.append({
                 "path": relative_path,
                 "error": str(error),
+                "kind": "file",
             })
 
     return {
@@ -75,6 +87,7 @@ def create_baseline(folder_path, exclusions=None):
         "failed_files": failed_files,
         "complete": len(failed_files) == 0,
     }
+
 
 
 def save_baseline(baseline, destination):

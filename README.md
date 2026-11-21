@@ -127,7 +127,7 @@ while continuing through accessible files.
 ## Project Documentation
 
 - [Requirements document](docs/requirements.md)
-- [Requirements PDF](docs/requirements.pdf)
+- [Requirements PDF](docs/HashGuardInitialRequirements.pdf)
 - [Product backlog](docs/backlog.md)
 - [Course alignment checklist](docs/course-alignment.md)
 

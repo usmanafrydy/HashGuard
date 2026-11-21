@@ -8,6 +8,7 @@ from src.file_scanner import scan_folder
 from src.baseline_manager import validate_baseline
 
 
+
 def scan_current_folder(folder_path, exclusions=None):
     """Hash files currently present in the monitored folder."""
 
@@ -19,30 +20,29 @@ def scan_current_folder(folder_path, exclusions=None):
         )
 
     root = selected_folder.resolve()
-    exclusions = set(exclusions or [])
+    exclusions = list(exclusions or [])
 
     current_files = {}
     failed_files = []
 
     try:
-        scanned_files = scan_folder(root)
+        scanned_files = scan_folder(
+            root,
+            exclusions=exclusions,
+            errors=failed_files,
+        )
+
     except OSError as error:
-        return {
-            "files": {},
-            "failed_files": [
-                {
-                    "path": ".",
-                    "error": f"Folder scanning failed: {error}",
-                }
-            ],
-            "complete": False,
-        }
+        failed_files.append({
+            "path": ".",
+            "error": f"Folder scanning failed: {error}",
+            "kind": "folder",
+        })
+
+        scanned_files = []
 
     for file_path in scanned_files:
         relative_path = file_path.relative_to(root).as_posix()
-
-        if relative_path in exclusions:
-            continue
 
         try:
             before = file_path.stat()
@@ -53,17 +53,18 @@ def scan_current_folder(folder_path, exclusions=None):
                 before.st_size != after.st_size
                 or before.st_mtime_ns != after.st_mtime_ns
             ):
-                raise OSError("File changed while being hashed.")
+                raise OSError(
+                    "File changed while being hashed."
+                )
 
             current_files[relative_path] = file_hash
 
         except OSError as error:
-            failed_files.append(
-                {
-                    "path": relative_path,
-                    "error": str(error),
-                }
-            )
+            failed_files.append({
+                "path": relative_path,
+                "error": str(error),
+                "kind": "file",
+            })
 
     return {
         "files": current_files,
@@ -72,32 +73,59 @@ def scan_current_folder(folder_path, exclusions=None):
     }
 
 
+def _affected_by_scan_error(relative_path, failed_records):
+    """Check whether an error prevents reliable verification."""
+
+    for record in failed_records:
+        failed_path = record["path"]
+        kind = record.get("kind", "file")
+
+        # A root scanning failure affects every file.
+        if failed_path == ".":
+            return True
+
+        # The individual file or entry could not be checked.
+        if relative_path == failed_path:
+            return True
+
+        # A failed folder or unknown entry may contain this file.
+        if kind in ("folder", "entry"):
+            prefix = failed_path.rstrip("/") + "/"
+
+            if relative_path.startswith(prefix):
+                return True
+
+    return False
+
+
+
+
 def detect_changes(baseline, current_scan):
-    """Compare a baseline with a current scan and classify file changes."""
+    """Compare baseline and current scan file hashes."""
 
     baseline_files = baseline["files"]
     current_files = current_scan["files"]
 
-    baseline_failed = {
-        record["path"]
-        for record in baseline.get("failed_files", [])
-    }
-
-    current_failed = {
-        record["path"]
-        for record in current_scan.get("failed_files", [])
-    }
+    baseline_failed = baseline.get("failed_files", [])
+    current_failed = current_scan.get("failed_files", [])
 
     baseline_complete = baseline.get("complete", False)
     current_complete = current_scan.get("complete", False)
 
+    # Include confirmed file errors, but not folder errors.
+    file_error_paths = {
+        record["path"]
+        for record in baseline_failed + current_failed
+        if (
+            record["path"] != "."
+            and record.get("kind", "file") == "file"
+        )
+    }
+
     all_paths = sorted(
-        (
-            set(baseline_files)
-            | set(current_files)
-            | baseline_failed
-            | current_failed
-        ) - {"."}
+        set(baseline_files)
+        | set(current_files)
+        | file_error_paths
     )
 
     results = {
@@ -112,10 +140,14 @@ def detect_changes(baseline, current_scan):
         in_baseline = relative_path in baseline_files
         in_current = relative_path in current_files
 
-        # File could not be verified in either scan.
+        # Check whether an error affects this file.
         if (
-            relative_path in baseline_failed
-            or relative_path in current_failed
+            _affected_by_scan_error(
+                relative_path, baseline_failed
+            )
+            or _affected_by_scan_error(
+                relative_path, current_failed
+            )
         ):
             results["unverified"].append(relative_path)
             continue
@@ -141,19 +173,23 @@ def detect_changes(baseline, current_scan):
             else:
                 results["unverified"].append(relative_path)
 
+    summary = {
+        "unchanged": len(results["unchanged"]),
+        "modified": len(results["modified"]),
+        "added": len(results["added"]),
+        "deleted": len(results["deleted"]),
+        "unverified": len(results["unverified"]),
+    }
+
+    summary["total"] = sum(summary.values())
+
     return {
         "results": results,
-        "summary": {
-            "unchanged": len(results["unchanged"]),
-            "modified": len(results["modified"]),
-            "added": len(results["added"]),
-            "deleted": len(results["deleted"]),
-            "unverified": len(results["unverified"]),
-            "total": sum(len(files) for files in results.values()),
-        },
+        "summary": summary,
         "baseline_complete": baseline_complete,
         "current_scan_complete": current_complete,
     }
+
 
 
 def compare_folder_with_baseline(baseline, folder_path):
