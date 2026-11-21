@@ -1,14 +1,24 @@
+
 """Detect added, modified, deleted, and unchanged files in HashGuard."""
 
 from pathlib import Path
 
 from src.file_hasher import hash_file
 from src.file_scanner import scan_folder
+from src.baseline_manager import validate_baseline
 
 
 def scan_current_folder(folder_path, exclusions=None):
     """Hash files currently present in the monitored folder."""
-    root = Path(folder_path).resolve()
+
+    selected_folder = Path(folder_path)
+
+    if selected_folder.is_symlink() or selected_folder.is_junction():
+        raise ValueError(
+            "Select a folder that is not a symbolic link or junction."
+        )
+
+    root = selected_folder.resolve()
     exclusions = set(exclusions or [])
 
     current_files = {}
@@ -64,6 +74,7 @@ def scan_current_folder(folder_path, exclusions=None):
 
 def detect_changes(baseline, current_scan):
     """Compare a baseline with a current scan and classify file changes."""
+
     baseline_files = baseline["files"]
     current_files = current_scan["files"]
 
@@ -80,7 +91,14 @@ def detect_changes(baseline, current_scan):
     baseline_complete = baseline.get("complete", False)
     current_complete = current_scan.get("complete", False)
 
-    all_paths = sorted(set(baseline_files) | set(current_files))
+    all_paths = sorted(
+        (
+            set(baseline_files)
+            | set(current_files)
+            | baseline_failed
+            | current_failed
+        ) - {"."}
+    )
 
     results = {
         "unchanged": [],
@@ -140,6 +158,9 @@ def detect_changes(baseline, current_scan):
 
 def compare_folder_with_baseline(baseline, folder_path):
     """Scan a folder and compare it with its saved baseline."""
+
+    validate_baseline(baseline, selected_folder=folder_path)
+
     current_scan = scan_current_folder(
         folder_path,
         exclusions=baseline.get("exclusions", []),
