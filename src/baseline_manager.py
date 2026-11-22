@@ -1,7 +1,9 @@
 """Create, save, load, and validate HashGuard file integrity baselines."""
 
 import json
+import os
 import re
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -91,7 +93,14 @@ def create_baseline(folder_path, exclusions=None):
 
 
 def save_baseline(baseline, destination):
-    """Save a validated baseline without overwriting an existing file."""
+    """Write a complete temporary baseline, then publish without overwriting.
+
+    Publication uses a hard link, which fails if the destination already exists,
+    including when another process creates it during saving. The filesystem
+    must support hard links; otherwise saving fails without publishing a partial
+    baseline. A process termination may leave a temporary file, but the final
+    destination is only published after writing, flushing and closing succeeds.
+    """
     destination = Path(destination)
 
     if destination.exists():
@@ -116,8 +125,39 @@ def save_baseline(baseline, destination):
 
     destination.parent.mkdir(parents=True, exist_ok=True)
 
-    with destination.open("x", encoding="utf-8") as file:
-        json.dump(baseline, file, indent=4)
+    temporary_path = None
+    original_error = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=destination.parent,
+            prefix=".hashguard-baseline-", suffix=".tmp", delete=False,
+        ) as file:
+            temporary_path = Path(file.name)
+            json.dump(baseline, file, indent=4)
+            file.flush()
+            os.fsync(file.fileno())
+
+        # Unlike replace(), link() never overwrites an existing destination.
+        # Close the temporary file first so this also works on Windows.
+        os.link(temporary_path, destination)
+    except BaseException as error:
+        # Preserve interruptions as well as ordinary write/publication errors.
+        original_error = error
+        raise
+    finally:
+        if temporary_path is not None:
+            try:
+                temporary_path.unlink(missing_ok=True)
+            except OSError as cleanup_error:
+                message = f"Could not remove temporary baseline '{temporary_path}': {cleanup_error}"
+                if original_error is not None:
+                    original_error.add_note(message)
+                else:
+                    cleanup_error.add_note(
+                        "The complete baseline was published successfully; "
+                        "only temporary-file cleanup failed."
+                    )
+                    raise
 
 
 def load_baseline(source):
@@ -235,6 +275,27 @@ def validate_baseline(baseline, selected_folder=None):
             or not record["error"]
         ):
             raise ValueError("Invalid failed-file record.")
+
+        # Legacy records omit kind; consumers treat these as file errors.
+        if "kind" in record and (
+            not isinstance(record["kind"], str)
+            or record["kind"] not in ("file", "folder", "entry")
+        ):
+            raise ValueError(
+                "Invalid failed-file record kind: expected file, folder, or entry."
+            )
+
+        relative_path = record["path"]
+        # A root error uses '.', otherwise apply the file-record path rules.
+        if relative_path != "." and (
+            Path(relative_path).is_absolute()
+            or "\\" in relative_path
+            or any(
+                part in ("", ".", "..")
+                for part in relative_path.split("/")
+            )
+        ):
+            raise ValueError(f"Unsafe failed-file record path: {relative_path}")
 
     if type(baseline["complete"]) is not bool:
         raise ValueError("Invalid baseline completion status.")
