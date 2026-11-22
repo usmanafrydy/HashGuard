@@ -1,4 +1,3 @@
-
 """Integration tests for scanning, exclusions, and errors."""
 
 import tempfile
@@ -29,7 +28,8 @@ class TestScannerIntegration(unittest.TestCase):
         cache.mkdir()
 
         (cache / "temp.txt").write_text(
-            "Temporary", encoding="utf-8"
+            "Temporary",
+            encoding="utf-8",
         )
 
         baseline = create_baseline(
@@ -62,11 +62,13 @@ class TestScannerIntegration(unittest.TestCase):
         private.mkdir()
 
         (private / "data.txt").write_text(
-            "Secret data", encoding="utf-8"
+            "Secret data",
+            encoding="utf-8",
         )
 
         (self.root / "public.txt").write_text(
-            "Public data", encoding="utf-8"
+            "Public data",
+            encoding="utf-8",
         )
 
         baseline = create_baseline(self.root)
@@ -107,6 +109,42 @@ class TestScannerIntegration(unittest.TestCase):
 
         self.assertEqual(errors[0]["path"], "private")
         self.assertEqual(errors[0]["kind"], "folder")
+
+    def test_filename_pattern_does_not_skip_folder_contents(self):
+        archive = self.root / "archive.log"
+        archive.mkdir()
+
+        watched = archive / "important.txt"
+        watched.write_text("Original", encoding="utf-8")
+
+        (self.root / "debug.log").write_text(
+            "Ignored log",
+            encoding="utf-8",
+        )
+
+        baseline = create_baseline(
+            self.root,
+            exclusions=["*.log"],
+        )
+
+        self.assertEqual(
+            list(baseline["files"]),
+            ["archive.log/important.txt"],
+        )
+        self.assertTrue(baseline["complete"])
+
+        watched.write_text("Changed", encoding="utf-8")
+
+        report = compare_folder_with_baseline(
+            baseline,
+            self.root,
+        )
+
+        self.assertEqual(
+            report["results"]["modified"],
+            ["archive.log/important.txt"],
+        )
+        self.assertEqual(report["summary"]["total"], 1)
 
 
 if __name__ == "__main__":

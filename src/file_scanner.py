@@ -1,4 +1,3 @@
-
 """Folder scanning functionality for HashGuard."""
 
 from pathlib import Path
@@ -38,9 +37,11 @@ def scan_folder(folder_path, exclusions=None, errors=None):
     """
     Scan a folder recursively.
 
-    Skip excluded files and folders.
-    Do not follow symbolic links or junctions.
+    Apply filename patterns to files and explicit folder exclusions
+    before entering folders. Skip symbolic links and junctions.
+
     Record access errors and continue when an error list is provided.
+    Otherwise, raise the error.
     """
 
     root = validate_folder(folder_path)
@@ -51,6 +52,12 @@ def scan_folder(folder_path, exclusions=None, errors=None):
         )
 
     exclusions = exclusions or []
+
+    folder_exclusions = [
+        rule
+        for rule in exclusions
+        if rule.replace("\\", "/").strip().endswith("/")
+    ]
 
     files = []
     folders_to_visit = [root]
@@ -78,15 +85,16 @@ def scan_folder(folder_path, exclusions=None, errors=None):
         for entry in entries:
             relative_path = entry.relative_to(root).as_posix()
 
-            # Skip files and folders matching exclusion rules.
-            if is_excluded(relative_path, exclusions):
+            # Skip explicitly excluded folder paths before entering them.
+            if is_excluded(relative_path, folder_exclusions):
                 continue
 
             try:
                 entry_info = entry.stat(follow_symlinks=False)
 
                 if S_ISREG(entry_info.st_mode):
-                    files.append(entry)
+                    if not is_excluded(relative_path, exclusions):
+                        files.append(entry)
 
                 elif S_ISDIR(entry_info.st_mode):
                     if not entry.is_junction():
