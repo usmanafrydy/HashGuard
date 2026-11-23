@@ -257,6 +257,115 @@ class TestChangeDetector(unittest.TestCase):
         self.assertEqual(scan["failed_files"], [])
         self.assertTrue(scan["complete"])
 
+    # HG-10 additional tests
+
+    def test_folder_error_marks_files_inside_as_unverified(self):
+        baseline = {
+            "files": {
+                "private/secret.txt": "a" * 64,
+                "public.txt": "b" * 64,
+            },
+            "failed_files": [],
+            "complete": True,
+        }
+
+        current_scan = {
+            "files": {
+                "public.txt": "b" * 64,
+            },
+            "failed_files": [
+                {
+                    "path": "private",
+                    "error": "Access denied",
+                    "kind": "folder",
+                }
+            ],
+            "complete": False,
+        }
+
+        comparison = detect_changes(baseline, current_scan)
+
+        self.assertEqual(
+            comparison["results"]["unverified"],
+            ["private/secret.txt"],
+        )
+
+        self.assertEqual(
+            comparison["results"]["unchanged"],
+            ["public.txt"],
+        )
+
+        self.assertEqual(comparison["results"]["deleted"], [])
+
+    def test_unaffected_file_is_still_detected_as_modified(self):
+        baseline = {
+            "files": {
+                "private/secret.txt": "a" * 64,
+                "public.txt": "b" * 64,
+            },
+            "failed_files": [],
+            "complete": True,
+        }
+
+        current_scan = {
+            "files": {
+                "public.txt": "c" * 64,
+            },
+            "failed_files": [
+                {
+                    "path": "private",
+                    "error": "Access denied",
+                    "kind": "folder",
+                }
+            ],
+            "complete": False,
+        }
+
+        comparison = detect_changes(baseline, current_scan)
+
+        self.assertEqual(
+            comparison["results"]["unverified"],
+            ["private/secret.txt"],
+        )
+
+        self.assertEqual(
+            comparison["results"]["modified"],
+            ["public.txt"],
+        )
+
+    def test_entry_error_does_not_confirm_deletion(self):
+        baseline = {
+            "files": {
+                "unknown.txt": "a" * 64,
+            },
+            "failed_files": [],
+            "complete": True,
+        }
+
+        current_scan = {
+            "files": {},
+            "failed_files": [
+                {
+                    "path": "unknown.txt",
+                    "error": "Unable to access entry",
+                    "kind": "entry",
+                }
+            ],
+            "complete": False,
+        }
+
+        comparison = detect_changes(baseline, current_scan)
+
+        self.assertEqual(
+            comparison["results"]["unverified"],
+            ["unknown.txt"],
+        )
+
+        self.assertEqual(
+            comparison["results"]["deleted"],
+            [],
+        )
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
