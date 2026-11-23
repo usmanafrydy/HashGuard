@@ -35,7 +35,7 @@ Priorities, responsibilities, and statuses will be updated as development progre
 | HG-18 | Preserve and select between baseline versions | Could | To be agreed | To do |
 | HG-19 | Build an HTML scraper to retrieve up to 10 security advisories | Must | Siaf Akbar | Done |
 | HG-20 | Display advisory titles, available publication dates, source links, and last successful retrieval time | Must | To be agreed | To do |
-| HG-21 | Handle advisory retrieval failures while preserving previous results and keeping file monitoring available | Must | To be agreed | To do |
+| HG-21 | Handle advisory retrieval failures while preserving previous results and keeping file monitoring available | Must | Siaf Akbar | Done |
 | HG-22 | Write automated tests for advisory parsing and retrieval error handling | Must | Siaf Akbar | Done |
 | HG-23 | Keep the desktop interface responsive during scanning and advisory retrieval using background tasks | Should | To be agreed | To do |
 

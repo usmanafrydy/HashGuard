@@ -1,4 +1,3 @@
-
 from datetime import datetime, timezone
 from unittest.mock import patch
 
@@ -242,3 +241,54 @@ def test_refresh_success_clears_previous_error():
     assert result is True
     assert manager.last_refresh_error is None
     assert manager.advisories == [new_advisory]
+
+
+# -----------------------------
+# HG-21 Integration Test
+# -----------------------------
+
+def test_advisory_failure_does_not_interrupt_file_scanning():
+    import tempfile
+    from pathlib import Path
+
+    from src.file_scanner import scan_folder
+
+    old_advisory = Advisory(
+        title="Previous Advisory",
+        publication_date="2026-11-19",
+        url="https://example.com/old",
+    )
+
+    manager = AdvisoryManager()
+    manager.advisories = [old_advisory]
+
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        folder = Path(temporary_directory)
+
+        file_one = folder / "file1.txt"
+        file_two = folder / "file2.txt"
+
+        file_one.write_text("First file", encoding="utf-8")
+        file_two.write_text("Second file", encoding="utf-8")
+
+        # Simulate advisory retrieval failure.
+        with patch(
+            "src.advisory_scraper.fetch_advisories",
+            side_effect=requests.ConnectionError(
+                "Internet connection failed"
+            ),
+        ):
+            result = manager.refresh()
+
+        # Advisory retrieval failure is handled.
+        assert result is False
+
+        # Previously retrieved advisories remain available.
+        assert manager.advisories == [old_advisory]
+
+        # File scanning continues successfully.
+        scanned_files = scan_folder(folder)
+
+        assert len(scanned_files) == 2
+        assert file_one in scanned_files
+        assert file_two in scanned_files
