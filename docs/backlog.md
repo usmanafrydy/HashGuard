@@ -16,7 +16,7 @@ Priorities, responsibilities, and statuses will be updated as development progre
 | HG-01 | Create the public repository and initial README | Must | Usman | Done |
 | HG-02 | Draft the initial requirements document | Must | Usman | Done |
 | HG-03A | Review functional requirements and add acceptance conditions for baseline creation and change detection | Must | Siaf Akbar | Done |
-| HG-03B | Review error handling and limitations and document related test scenarios | Must | Mushaf | To do |
+| HG-03B | Review error handling and limitations and [document related test scenarios](integration-testing.md) | Must | Mushaf | Done |
 | HG-04 | Review backlog priorities and agree on responsibilities | Must | All members | Done |
 | HG-05A | Export the draft requirements to PDF and add it to the repository | Must | Usman | Done |
 | HG-05B | Finalize requirements after group review and update the Markdown and PDF copies | Must | Usman | To do |
